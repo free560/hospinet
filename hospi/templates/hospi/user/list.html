@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+<div class="flex items-center gap-2">
+    <i class="fas fa-users-cog text-cyan-400 text-2xl"></i>
+    <span class="text-white font-bold text-2xl">Gestion des Utilisateurs</span>
+</div>
+{% endblock %}
+
+{% block page_subtitle %}
+Liste des travailleurs de l’hôpital
+{% endblock %}
+
+{% block content %}
+<div class="card-dark p-6">
+
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+        <h2 class="text-xl font-bold text-white">
+            <i class="fas fa-user-shield text-green-400 mr-2"></i>
+            Utilisateurs enregistrés
+        </h2>
+
+        <a href="#"
+           class="btn-success flex items-center gap-2">
+            <i class="fas fa-user-plus"></i>
+            Créer un utilisateur
+        </a>
+    </div>
+
+    <!-- TABLE -->
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-300">
+            <thead class="text-xs uppercase bg-gray-800 text-gray-400">
+                <tr>
+                    <th class="px-4 py-3">Nom</th>
+                    <th class="px-4 py-3">Email</th>
+                    <th class="px-4 py-3">Rôle</th>
+                    <th class="px-4 py-3">Statut</th>
+                    <th class="px-4 py-3 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr class="border-b border-gray-700 hover:bg-gray-800 transition">
+                    <td class="px-4 py-3 font-semibold text-white">
+                        {{ user.first_name }} {{ user.last_name }}
+                    </td>
+                    <td class="px-4 py-3">
+                        {{ user.email }}
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="role-badge role-{{ user.role|lower }}">
+                            {{ user.role }}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                        {% if user.is_active %}
+                            <span class="status active">Actif</span>
+                        {% else %}
+                            <span class="status inactive">Inactif</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <div class="flex justify-center gap-3">
+                            <a href="#"
+                               class="action-btn edit"
+                               title="Modifier">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="#"
+                               class="action-btn delete"
+                               title="Désactiver">
+                                <i class="fas fa-user-slash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-6 text-gray-400">
+                        Aucun utilisateur trouvé
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- STYLES -->
+<style>
+.card-dark {
+    background: #020617;
+    border-radius: 1rem;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.btn-success {
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, #065F46, #10B981);
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-success:hover {
+    box-shadow: 0 0 20px rgba(16,185,129,0.6);
+    transform: translateY(-2px);
+}
+
+.role-badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.role-admin { background: #1E40AF; color: #BFDBFE; }
+.role-medecin { background: #065F46; color: #A7F3D0; }
+.role-infirmier { background: #7C2D12; color: #FED7AA; }
+.role-acceuil { background: #4C1D95; color: #E9D5FF; }
+.role-caissier { background: #7C2D12; color: #FCD34D; }
+.role-labo { background: #5B21B6; color: #DDD6FE; }
+.role-pharmacien { background: #064E3B; color: #6EE7B7; }
+
+.status {
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.status.active {
+    background: #064E3B;
+    color: #6EE7B7;
+}
+
+.status.inactive {
+    background: #7F1D1D;
+    color: #FCA5A5;
+}
+
+.action-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.action-btn.edit {
+    background: #1E40AF;
+}
+
+.action-btn.delete {
+    background: #7F1D1D;
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+    opacity: 0.9;
+}
+</style>
+
+{% endblock %}

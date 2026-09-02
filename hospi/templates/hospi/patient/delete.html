@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Supprimer Patient - {{ patient.nom }} {{ patient.prenom }} - HospiNet{% endblock %}
+{% block page_title %}Suppression Patient{% endblock %}
+{% block page_subtitle %}Action critique et irréversible{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto fade-in">
+
+    <div class="bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-700">
+
+        <!-- HEADER DANGER -->
+        <div class="bg-gradient-to-r from-red-700 to-red-900 p-8 text-white text-center">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-white/10 flex items-center justify-center">
+                <i class="fas fa-exclamation-triangle text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold">Action critique</h2>
+            <p class="text-red-200 mt-1">
+                Vous êtes sur le point de supprimer définitivement un patient
+            </p>
+        </div>
+
+        <!-- BODY -->
+        <div class="p-8 text-gray-100">
+
+            <!-- PATIENT -->
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-violet-700 flex items-center justify-center">
+                    <span class="text-2xl font-bold text-white">
+                        {{ patient.nom|first|upper }}
+                    </span>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold">{{ patient.nom }} {{ patient.prenom }}</h3>
+                    <p class="text-sm text-gray-400">
+                        {{ patient.numero_patient }} • {{ patient.age }} ans • {{ patient.get_sexe_display }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- DONNÉES IMPACTÉES -->
+            <div class="bg-red-950/40 border border-red-800 rounded-xl p-6 mb-8">
+                <h4 class="font-semibold mb-4 flex items-center text-red-400">
+                    <i class="fas fa-database mr-2"></i> Données supprimées
+                </h4>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {% for label, value in
+                        "Consultations"|make_list %}
+                    {% endfor %}
+
+                    <div class="stat-danger">
+                        <div class="stat-value">{{ consultations.count }}</div>
+                        <div class="stat-label">Consultations</div>
+                    </div>
+                    <div class="stat-danger">
+                        <div class="stat-value">{{ examens.count }}</div>
+                        <div class="stat-label">Examens</div>
+                    </div>
+                    <div class="stat-danger">
+                        <div class="stat-value">{{ hospitalisations.count }}</div>
+                        <div class="stat-label">Hospitalisations</div>
+                    </div>
+                    <div class="stat-danger">
+                        <div class="stat-value">{{ factures.count }}</div>
+                        <div class="stat-label">Factures</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AVERTISSEMENTS -->
+            <div class="space-y-4 mb-8">
+                <div class="alert alert-danger">
+                    <i class="fas fa-ban"></i>
+                    <span>Cette action est irréversible</span>
+                </div>
+                <div class="alert alert-warning">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Impact direct sur les statistiques hospitalières</span>
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Archivage ou désactivation recommandés</span>
+                </div>
+            </div>
+
+            <!-- FORM -->
+            <form method="POST" id="deleteForm" class="space-y-6">
+                {% csrf_token %}
+
+                <div>
+                    <label class="label-danger">
+                        Tapez <strong>SUPPRIMER</strong> pour confirmer
+                    </label>
+                    <input id="confirmInput" type="text" class="input-dark text-center font-mono" required>
+                </div>
+
+                <div>
+                    <label class="label-danger">Raison de suppression</label>
+                    <select name="raison" class="input-dark" required>
+                        <option value="">---</option>
+                        <option value="DOUBLE">Doublon</option>
+                        <option value="ERREUR">Erreur</option>
+                        <option value="DECES">Décès</option>
+                        <option value="DEMANDE">Demande patient</option>
+                        <option value="AUTRE">Autre</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="label">Commentaire</label>
+                    <textarea name="commentaire" rows="3" class="input-dark"></textarea>
+                </div>
+
+                <div class="flex items-center gap-3 bg-red-950/40 p-4 rounded-xl border border-red-800">
+                    <input id="finalConfirmation" type="checkbox" class="h-5 w-5 text-red-600">
+                    <label for="finalConfirmation" class="text-sm">
+                        Je confirme vouloir supprimer définitivement ce patient
+                    </label>
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <a href="{% url 'patient_list' %}" class="btn-secondary">
+                        Annuler
+                    </a>
+
+                    <button id="deleteButton" disabled
+                            class="btn-danger">
+                        <i class="fas fa-trash mr-2"></i> Supprimer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- STYLES -->
+<style>
+.stat-danger {
+    background: #020617;
+    border: 1px solid #7f1d1d;
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+}
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f87171;
+}
+.stat-label {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.input-dark {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: #020617;
+    border: 1px solid #374151;
+    border-radius: 0.75rem;
+    color: white;
+}
+.input-dark:focus {
+    border-color: #06b6d4;
+    outline: none;
+}
+
+.label {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+.label-danger {
+    font-size: 0.75rem;
+    color: #f87171;
+}
+
+.alert {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+.alert-danger {
+    background: #7f1d1d33;
+    border: 1px solid #7f1d1d;
+    color: #f87171;
+}
+.alert-warning {
+    background: #78350f33;
+    border: 1px solid #78350f;
+    color: #fbbf24;
+}
+.alert-info {
+    background: #0e749033;
+    border: 1px solid #0e7490;
+    color: #22d3ee;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #7f1d1d, #991b1b);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    color: white;
+    font-weight: 600;
+}
+.btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #374151;
+}
+</style>
+
+<script>
+const confirmInput = document.getElementById('confirmInput');
+const finalCheckbox = document.getElementById('finalConfirmation');
+const deleteButton = document.getElementById('deleteButton');
+const raison = document.querySelector('select[name="raison"]');
+
+function updateDeleteButton() {
+    deleteButton.disabled = !(
+        confirmInput.value === 'SUPPRIMER' &&
+        finalCheckbox.checked &&
+        raison.value !== ''
+    );
+}
+confirmInput.addEventListener('input', updateDeleteButton);
+finalCheckbox.addEventListener('change', updateDeleteButton);
+raison.addEventListener('change', updateDeleteButton);
+</script>
+{% endblock %}
